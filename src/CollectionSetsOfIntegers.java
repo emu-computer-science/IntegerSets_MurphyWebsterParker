@@ -18,7 +18,7 @@ public class CollectionSetsOfIntegers {
 	
 	public static Integer[][] save() {
 		System.out.println("You have called the save function!");
-		Integer[][] fuck = {{}};
-		return fuck;
+		Integer[][] sets = {{}};
+		return sets;
 	}
 }
