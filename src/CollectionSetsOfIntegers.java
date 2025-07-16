@@ -1,5 +1,6 @@
 //Created by Dibblz
 
+
 import java.util.Arrays;
 import java.util.ArrayList;
 
@@ -8,7 +9,7 @@ public class CollectionSetsOfIntegers {
 	ArrayList<int[]> sets = new ArrayList<>();  //THE VARIABLE FOR THE ARRAY OF ARRYS!!
 	
 	
-	/* Lists all the sets(int arrays) in the list of sets(array of int array)
+	/* Lists all the sets in the 'sets' list, one per line with a letter label (A, B, C...). 
 	 * */	
 	public static void listAll() {
 	    System.out.println("You have called the listAll function!");
@@ -20,7 +21,7 @@ public class CollectionSetsOfIntegers {
 	}
 	
 	
-	/* Creates an array and ADDS it to the array  of arrays
+	/* Adds a new int[] set to the list of sets.
 	 * */	
 	public static void createSet(int[] x) {
 	    System.out.println("You have called the createSet function!");
@@ -29,7 +30,7 @@ public class CollectionSetsOfIntegers {
 	}	
 	
 	
-	/* DELETES an array from the array  of arrays
+	/* Deletes a set at the specified index from the list of sets.
 	 * */
 	public static void deleteSet(int x) {
 		System.out.println("You have called the deleteSet function!");
