@@ -15,19 +15,19 @@ public class CollectionSetsOfIntegers {
 	
 	/* Lists all the sets(int arrays) in the list of sets(array of int array)
 	 * */	
-	public static void listAll(int[][] x) {
-		System.out.println("You have called the listAll function!");
-		for(int i = 0; i  < x.length; i++) {
-			char letter = (char) ('A'+i);
-				System.out.println(letter + ":" + Arrays.toString(x[i]));
-			}
-			
-		}
+	public static void listAll() {
+	    System.out.println("You have called the listAll function!");
+	    for (int i = 0; i < sets.size(); i++) {
+	        char letter = (char) ('A' + i);
+	        System.out.println(letter + ": " + Arrays.toString(sets.get(i)));
+	    }
+	}
 	
 	/* Creates an array and adds it to the array  of arrays
 	 * */	
-	public static int[][] createSet(int[] x) {
-		System.out.println("You have called the createNewSet function!");
+	public static void createSet(int[] x) {
+	    System.out.println("You have called the createSet function!");
+	    sets.add(x);
 	}
 	
 	
@@ -53,15 +53,6 @@ public class CollectionSetsOfIntegers {
 		return sets;
 	}
 	
-	/* public static void main(String[] args) {  //main function just for testing
-		int[][] array1 = {
-				{1,2,3,4},
-				{1},
-				{1,2,3,4,5},
-				{00000000000}};
-	
-		listAll(array1);
-	} */
 		
 }
 
