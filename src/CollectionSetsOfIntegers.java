@@ -33,8 +33,9 @@ public class CollectionSetsOfIntegers {
 	
 	/* Deletes an array from the array  of arrays
 	 * */
-	public void deleteSet() {
+	public static void deleteSet(int x) {
 		System.out.println("You have called the deleteSet function!");
+		sets.remove(x);
 	}
 	
 	
