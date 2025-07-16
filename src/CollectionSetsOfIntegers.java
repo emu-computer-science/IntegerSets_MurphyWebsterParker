@@ -19,13 +19,14 @@ public class CollectionSetsOfIntegers {
 	    }
 	}
 	
+	
 	/* Creates an array and ADDS it to the array  of arrays
 	 * */	
 	public static void createSet(int[] x) {
 	    System.out.println("You have called the createSet function!");
 	    
 	    sets.add(x);
-	}
+	}	
 	
 	
 	/* DELETES an array from the array  of arrays
@@ -37,8 +38,9 @@ public class CollectionSetsOfIntegers {
 	}
 	
 	
-	/* Restores a save file, saved using CollectionSetsOfIntegers.save().
-	 * This will restore the saved array  of arrays	 * */
+	/*   Restores the list of sets from a file saved by the 'save' method.
+ * Each line of the file should represent a set, with comma-separated integers.
+ * Clears any existing sets before loading new ones. */
 	public static void restore(String filename) throws java.io.FileNotFoundException {  //takes argument of filename
 		System.out.println("You have called the restore function!");
 		
@@ -61,8 +63,10 @@ public class CollectionSetsOfIntegers {
 	}
 	
 	
-	/* Save function that stores your array of arrays into a text file. 
-	 * Text file location is in the /src file for this project
+	/* * Saves all sets in the 'sets' list to a text file.
+ * Each int[] set is written on its own line, with values comma-separated (e.g., 1,2,3).
+ * The file is saved relative to the current working directory 
+ * typically the project root unless a full path is specified.
 	 * */
 	public static void save(String filename) throws java.io.FileNotFoundException { //takes argument of filename
 	    System.out.println("You have called the save function!");
