@@ -26,7 +26,7 @@ public class CollectionSetsOfIntegers {
 	
 	/* Creates an array and adds it to the array  of arrays
 	 * */	
-	public static void createSet(int[] x) {
+	public static int[][] createSet(int[] x) {
 		System.out.println("You have called the createNewSet function!");
 	}
 	
@@ -53,15 +53,15 @@ public class CollectionSetsOfIntegers {
 		return sets;
 	}
 	
-	/*public static void main(String[] args) {
+	/* public static void main(String[] args) {  //main function just for testing
 		int[][] array1 = {
 				{1,2,3,4},
 				{1},
 				{1,2,3,4,5},
-				{00000000000}}; */
+				{00000000000}};
 	
-	//	listAll(array1);
-	//}
+		listAll(array1);
+	} */
 		
 }
 
