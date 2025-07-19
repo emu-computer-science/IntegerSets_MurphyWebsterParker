@@ -28,6 +28,7 @@ public class UserInteraction {
             case REMOVE: handleRemove(command); break;
             case SAVE: handleSave(command); break;
             case RESTORE: handleRestore(command); break;
+            case HELP: handleHelp(); break;
             case EXIT: case QUIT: return false;
             default: throw new InvalidCommandException("Unknown command type.");
         }
