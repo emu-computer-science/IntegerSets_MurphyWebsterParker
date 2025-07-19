@@ -92,16 +92,48 @@ public class UserInteraction {
 
     // Method shells for you to implement later:
 
-    private void handleAdd() {
-        // TODO: implement ADD command
+    private void handleAdd() throws InvalidCommandException {
+        checkSetSelected();
+        System.out.println("Enter integers to add, separated by spaces:");
+        Scanner scanner = new Scanner(System.in);
+        String line = scanner.nextLine().trim();
+        if (line.isEmpty()) {
+            System.out.println("No values entered. Nothing added.");
+            return;
+        }
+
+        String[] parts = line.split("\\s+");
+        int[] values = new int[parts.length];
+        for (int i = 0; i < parts.length; i++) {
+            values[i] = Integer.parseInt(parts[i]);
+        }
+
+        int[] current = CollectionSetsOfIntegers.sets.get(currentSetIndex);
+        int[] updated = SetOfIntegers.addValue(current, values);
+        CollectionSetsOfIntegers.sets.set(currentSetIndex, updated);
+        System.out.println("Updated set: " + Arrays.toString(updated));
     }
 
-    private void handleSort() {
-        // TODO: implement SORT command
+    private void handleSort() throws InvalidCommandException {
+        if (currentSetIndex == -1) {
+            throw new InvalidCommandException("No set is currently selected.");
+        }
+
+        int[] original = CollectionSetsOfIntegers.sets.get(currentSetIndex);
+        int[] sorted = SetOfIntegers.sortIncreasing(original);
+        CollectionSetsOfIntegers.sets.set(currentSetIndex, sorted);
+        System.out.println("Set sorted in increasing order: " + Arrays.toString(sorted));
     }
 
-    private void handleReverse() {
-        // TODO: implement REVERSE command
+    private void handleReverse() throws InvalidCommandException {
+        if (currentSetIndex == -1) {
+            throw new InvalidCommandException("No set is currently selected.");
+        }
+
+        int[] original = CollectionSetsOfIntegers.sets.get(currentSetIndex);
+        int[] reversed = SetOfIntegers.sortDecreasing(original);
+        CollectionSetsOfIntegers.sets.set(currentSetIndex, reversed);
+        System.out.println("Set sorted in decreasing order: " + Arrays.toString(reversed));
     }
 
     private void handleLabel() {
@@ -122,6 +154,12 @@ public class UserInteraction {
 
     private void handleQuit() {
         // TODO: implement QUIT command (if different from EXIT)
+    }
+    
+    private void checkSetSelected() throws InvalidCommandException {
+        if (currentSetIndex == -1 || currentSetIndex >= CollectionSetsOfIntegers.sets.size()) {
+            throw new InvalidCommandException("No valid set is currently selected.");
+        }
     }
 
     // --- Supporting classes ---
