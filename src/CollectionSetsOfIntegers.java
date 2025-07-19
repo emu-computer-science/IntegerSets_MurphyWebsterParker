@@ -1,4 +1,4 @@
-//Created by Dibblz
+    //Created by Dibblz
 
 
 import java.util.Arrays;
@@ -93,5 +93,3 @@ public class CollectionSetsOfIntegers {
 	
 }
 	
-		
-
