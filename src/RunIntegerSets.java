@@ -10,7 +10,8 @@ public class RunIntegerSets {
         UserInteraction ui = new UserInteraction();
 
         System.out.println("Welcome to Integer Sets Manager!");
-        System.out.println("Enter commands (NEW, SHOW, SELECT, DELETE, EXIT).");
+        System.out.println("Enter commands (NEW, SHOW, SELECT, DELETE, EXIT, RANDOMIZE, ADD, REVERSE, SORT."); 
+        System.out.println(" Or enter HELP to display help menu.");
 
         boolean running = true;
 

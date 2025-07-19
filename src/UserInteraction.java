@@ -21,15 +21,13 @@ public class UserInteraction {
             case DELETE: handleDelete(command); break;
             case SELECT: handleSelect(command); break;
             case EXIT: return false;
-            // Add other cases here as you implement them
             case ADD: handleAdd(); break;
+            case RANDOMIZE: handleRandomize(); break;
             case SORT: handleSort(); break;
             case REVERSE: handleReverse(); break;
-            case LABEL: handleLabel(); break;
             case HELP: handleHelp(); break;
             case SAVE: handleSave(); break;
             case RESTORE: handleRestore(); break;
-            case QUIT: handleQuit(); break;
             default: throw new InvalidCommandException("Unrecognized command.");
         }
         return true;
@@ -90,26 +88,112 @@ public class UserInteraction {
         System.out.println("Set " + label + " has been selected.");
     }
 
-    // Method shells for you to implement later:
-
     private void handleAdd() {
-        // TODO: implement ADD command
+        if (currentSetIndex == -1) {
+            System.out.println("There is no currently selected set to add values to.");
+            return;
+        }
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Enter integers to add separated by spaces:");
+        String line = scanner.nextLine().trim();
+        if (line.isEmpty()) {
+            System.out.println("No integers entered to add.");
+            return;
+        }
+        String[] tokens = line.split("\\s+");
+        int[] valuesToAdd = new int[tokens.length];
+        try {
+            for (int i = 0; i < tokens.length; i++) {
+                valuesToAdd[i] = Integer.parseInt(tokens[i]);
+            }
+        } catch (NumberFormatException e) {
+            System.out.println("Invalid input. Please enter only integers.");
+            return;
+        }
+        int[] currentSet = CollectionSetsOfIntegers.sets.get(currentSetIndex);
+        int[] updatedSet = SetOfIntegers.addValue(currentSet, valuesToAdd);
+        CollectionSetsOfIntegers.sets.set(currentSetIndex, updatedSet);
+        System.out.println("Values added. New set: " + Arrays.toString(updatedSet));
     }
 
+    private void handleRandomize() {
+//If statement to verify that there is a sort to set.
+    	if (currentSetIndex == -1) {
+    		System.out.println("There is no currently selected set to randomize.");
+    		return;
+    	}
+//Retrieve set from CollectionSetsOfIntegers.
+    	int[] currentSet = CollectionSetsOfIntegers.sets.get(currentSetIndex);
+//Run randomSort method from SetOfIntegers
+    	int[] randomizedSet = SetOfIntegers.randomSort(currentSet);
+    	CollectionSetsOfIntegers.sets.set(currentSetIndex, randomizedSet);
+//Output for Random Sort.
+    	System.out.println("The set has been randomized, resulting in " + Arrays.toString(randomizedSet));
+}
+    
     private void handleSort() {
-        // TODO: implement SORT command
+//If statement to verify that there is a sort to set.
+        if (currentSetIndex == -1) {
+            System.out.println("There is no currently selected set to sort.");
+            return;
+        }
+//Retrieve set from CollectionSetsOfIntegers
+        int[] currentSet = CollectionSetsOfIntegers.sets.get(currentSetIndex);        
+// Swaps calls the amount of swaps the insertion sort took and displays in the output below.
+        int swaps = insertionSort(currentSet);
+        CollectionSetsOfIntegers.sets.set(currentSetIndex, currentSet);
+//Output for Sort.
+        System.out.println("It took " + swaps + " swaps to sort the set and resulted in [increasing] ");
+     
+    }
+//Insertion sort algorithm to sort the sets in increasing order. Every time there is a pass, the counter swaps increases to get a final count.
+    private int insertionSort(int[] array) {
+        int swaps = 0;
+        for (int i = 1; i < array.length; i++) {
+            int key = array[i];
+            int j = i - 1;
+            while (j >= 0 && array[j] > key) {
+                array[j + 1] = array[j];
+                j--;
+                swaps++;
+            }
+            array[j + 1] = key;
+        }
+        return swaps;
     }
 
     private void handleReverse() {
-        // TODO: implement REVERSE command
+//If statement to verify that there is a sort to set.
+        if (currentSetIndex == -1) {
+            System.out.println("There is no currently selected set to reverse.");
+            return;
+        }
+//Retrieve set from CollectionSetsOfIntegers, int n gets the length of the set, for loop reverses the order of values in the set.
+//For loop is complete when every value has been placed in reverse order.
+        int[] currentSet = CollectionSetsOfIntegers.sets.get(currentSetIndex);
+        int n = currentSet.length;
+        for (int i = 0; i < n / 2; i++) {
+            int temp = currentSet[i];
+            currentSet[i] = currentSet[n - 1 - i];
+            currentSet[n - 1 - i] = temp;
+        }
+        CollectionSetsOfIntegers.sets.set(currentSetIndex, currentSet);
+//Output for Reverse Sort.
+        System.out.println("The set has been reversed: " + Arrays.toString(currentSet));
     }
-
-    private void handleLabel() {
-        // TODO: implement LABEL command
-    }
-
+//Display Help Menu.
     private void handleHelp() {
-        // TODO: implement HELP command
+        	System.out.println("NEW: Create a new set."); 
+        	System.out.println("SHOW: Shows created sets.");
+        	System.out.println("SELECT: Selects set to modify.");
+        	System.out.println("ADD: After selecting a set, adds values to the set.");
+        	System.out.println("DELETE: After selecting a set, removes values from the set.");
+        	System.out.println("SORT: After selecting a set, sorts the given set in increasing order.");
+        	System.out.println("REVERSE: After selecting a set, reverses the order of the set.");
+        	System.out.println("RANDOMIZE: After selecting a set, randomizes the order of the set.");
+        	System.out.println("SAVE: After selecting a set, saves the values of a set into a file.");
+        	System.out.println("RESTORE: Restores previous set versions.");
+        	System.out.println("EXIT: Terminates the program.");
     }
 
     private void handleSave() {
@@ -118,10 +202,6 @@ public class UserInteraction {
 
     private void handleRestore() {
         // TODO: implement RESTORE command
-    }
-
-    private void handleQuit() {
-        // TODO: implement QUIT command (if different from EXIT)
     }
 
     // --- Supporting classes ---
@@ -145,7 +225,7 @@ public class UserInteraction {
     }
 
     public enum CommandType {
-        SHOW, NEW, ADD, SORT, REVERSE, LABEL, DELETE, HELP, EXIT, SELECT, SAVE, RESTORE, QUIT
+        SHOW, NEW, ADD, SORT, REVERSE, RANDOMIZE, DELETE, HELP, EXIT, SELECT, SAVE, RESTORE, QUIT
     }
 
     public static class InvalidCommandException extends Exception {

@@ -2,28 +2,44 @@ import java.util.*;
 
 public class SetOfIntegers {
 
-    // First the array is cloned then, java.util uses the sort method to sort the sets in order. Still have to update how many sorts it takes.
-    public static int[] sortIncreasing(int[] set) {
-        int[] sorted = set.clone(); 
-        Arrays.sort(sorted);         
-        return sorted;
-    }
-
-    // First the array is cloned then, java.util uses the sort method again to sort sets in order but, for loop reverses the order.Still have to update how many sorts it takes.
-    public static int[] sortDecreasing(int[] set) {
+//Method to sort the sets in increasing order. First, the set is cloned so that the original is intact. 
+//For loop to execute the insertion sort algorithm. Swaps acts as a counter for the number of passes in the algorithm.
+    public static int[] sortIncreasing(int[] set, int[] swapCountHolder) {
         int[] sorted = set.clone();
-        Arrays.sort(sorted);         // sort ascending
+        int swaps = 0;
 
-        //For loop to reverse the sorted sets
-        for (int i = 0; i < sorted.length / 2; i++) {
-            int temp = sorted[i];
-            sorted[i] = sorted[sorted.length - 1 - i];
-            sorted[sorted.length - 1 - i] = temp;
+        for (int i = 1; i < sorted.length; i++) {
+            int key = sorted[i];
+            int j = i - 1;
+
+            while (j >= 0 && sorted[j] > key) {
+                sorted[j + 1] = sorted[j];
+                j--;
+                swaps++;
+            }
+            sorted[j + 1] = key;
         }
+
+        if (swapCountHolder != null && swapCountHolder.length > 0) {
+            swapCountHolder[0] = swaps;
+        }
+
         return sorted;
     }
 
-    // java.util uses the random method to randomly order the numbers in the set. Still have to update how many sorts it takes.
+//Method to reverse the order of the sets. First the set is cloned so that the original is intact.
+//For loop swaps the element in the front with the element at the end. The length/2 indicates that half the set needs to be looped through.
+    public static int[] reverse(int[] set) {
+        int[] reversed = set.clone();
+        for (int i = 0; i < reversed.length / 2; i++) {
+            int temp = reversed[i];
+            reversed[i] = reversed[reversed.length - 1 - i];
+            reversed[reversed.length - 1 - i] = temp;
+        }
+        return reversed;
+    }
+
+//Returns a new array with the elements randomized by running Random().
     public static int[] randomSort(int[] set) {
         int[] shuffled = set.clone();
         Random rand = new Random();
@@ -38,37 +54,30 @@ public class SetOfIntegers {
         return shuffled;
     }
 
-    // Adds user input to the set and returns the new array
+// Adds unique values to a set and returns a new array. First, it includes all of the original values, then adds additional values
+//indicated by the user. Returns the added values as integers and places them in the modified set.
     public static int[] addValue(int[] set, int... valuesToAdd) {
-        int[] result = new int[set.length + valuesToAdd.length];
-        System.arraycopy(set, 0, result, 0, set.length);
-        System.arraycopy(valuesToAdd, 0, result, set.length, valuesToAdd.length);
-        return result;
+        Set<Integer> uniqueValues = new LinkedHashSet<>();
+        for (int val : set) uniqueValues.add(val);
+        for (int val : valuesToAdd) uniqueValues.add(val);
+
+        return uniqueValues.stream().mapToInt(Integer::intValue).toArray();
     }
 
-    // Removes value indicated by the user input
+// Removes values from a set and returns a new array. For loop iterates through the set and keeps values not indicated by the user
+//with the If statement.
     public static int[] removeValue(int[] set, int... valuesToRemove) {
-        boolean[] toRemove = new boolean[set.length];
-        int removeCount = 0;
+        Set<Integer> valuesToRemoveSet = new HashSet<>();
+        for (int val : valuesToRemove) valuesToRemoveSet.add(val);
 
-        for (int i = 0; i < set.length; i++) {
-            for (int val : valuesToRemove) {
-                if (set[i] == val) {
-                    toRemove[i] = true;
-                    removeCount++;
-                    break;
-                }
+        List<Integer> resultList = new ArrayList<>();
+        for (int val : set) {
+            if (!valuesToRemoveSet.contains(val)) {
+                resultList.add(val);
             }
         }
 
-        int[] result = new int[set.length - removeCount];
-        int idx = 0;
-        for (int i = 0; i < set.length; i++) {
-            if (!toRemove[i]) {
-                result[idx++] = set[i];
-            }
-        }
-
-        return result;
+        return resultList.stream().mapToInt(Integer::intValue).toArray();
     }
 }
+
