@@ -2,7 +2,7 @@ import java.util.*;
 
 public class UserInteraction {
 
-    private int currentSetIndex = -1;
+    private int currentSetIndex = -1; // Tracks the currently selected set
 
     public boolean handleInput(String input) {
         try {
@@ -14,35 +14,33 @@ public class UserInteraction {
         }
     }
 
+    // Dispatches the command to the selected method
     private boolean dispatch(Command command) throws InvalidCommandException {
         switch (command.getType()) {
-            case SHOW: handleShow(command); break;
             case NEW: handleNew(command); break;
-            case DELETE: handleDelete(command); break;
+            case SHOW: handleShow(); break;
             case SELECT: handleSelect(command); break;
-            case EXIT: return false;
-            // Add other cases here as you implement them
-            case ADD: handleAdd(); break;
+            case DELETE: handleDelete(command); break;
             case SORT: handleSort(); break;
             case REVERSE: handleReverse(); break;
-            case LABEL: handleLabel(); break;
+            case RANDOMIZE: handleRandomize(); break;
+            case ADD: handleAdd(command); break;
+            case REMOVE: handleRemove(command); break;
+            case SAVE: handleSave(command); break;
+            case RESTORE: handleRestore(command); break;
             case HELP: handleHelp(); break;
-            case SAVE: handleSave(); break;
-            case RESTORE: handleRestore(); break;
-            case QUIT: handleQuit(); break;
-            default: throw new InvalidCommandException("Unrecognized command.");
+            case EXIT: case QUIT: return false;
+            default: throw new InvalidCommandException("Unknown command type.");
         }
         return true;
     }
 
-    private void handleShow(Command command) {
-        CollectionSetsOfIntegers.listAll();
-    }
+    //  Command Handlers 
 
     private void handleNew(Command command) throws InvalidCommandException {
         List<String> args = command.getArgs();
         if (args.isEmpty()) {
-            throw new InvalidCommandException("NEW command requires at least one integer.");
+            throw new InvalidCommandException("NEW requires at least one integer.");
         }
 
         try {
@@ -53,166 +51,179 @@ public class UserInteraction {
             CollectionSetsOfIntegers.createSet(newSet);
             System.out.println("New set created: " + Arrays.toString(newSet));
         } catch (NumberFormatException e) {
-            throw new InvalidCommandException("NEW command only accepts integers.");
+            throw new InvalidCommandException("Only integers are allowed.");
         }
     }
 
-    private void handleDelete(Command command) throws InvalidCommandException {
-        if (command.getArgs().size() != 1) {
-            throw new InvalidCommandException("Usage: DELETE <letter>");
-        }
-
-        String arg = command.getArgs().get(0).toUpperCase();
-        char label = arg.charAt(0);
-
-        if (label < 'A' || label >= 'A' + CollectionSetsOfIntegers.sets.size()) {
-            throw new InvalidCommandException("Invalid set label: " + label);
-        }
-
-        int index = label - 'A';
-        CollectionSetsOfIntegers.deleteSet(index);
-        System.out.println("Set " + label + " deleted.");
+    private void handleShow() {
+        CollectionSetsOfIntegers.listAll();
     }
 
     private void handleSelect(Command command) throws InvalidCommandException {
-        if (command.getArgs().size() != 1) {
-            throw new InvalidCommandException("Usage: SELECT <letter>");
-        }
+        if (command.getArgs().size() != 1)
+            throw new InvalidCommandException("SELECT requires a single letter (A, B, C...)");
 
-        String arg = command.getArgs().get(0).toUpperCase();
-        char label = arg.charAt(0);
+        char label = command.getArgs().get(0).toUpperCase().charAt(0);
+        int index = label - 'A';
 
-        if (label < 'A' || label >= 'A' + CollectionSetsOfIntegers.sets.size()) {
-            throw new InvalidCommandException("Invalid set label: " + label);
-        }
+        if (index < 0 || index >= CollectionSetsOfIntegers.sets.size())
+            throw new InvalidCommandException("Invalid set letter.");
 
-        currentSetIndex = label - 'A';
-        System.out.println("Set " + label + " has been selected.");
+        currentSetIndex = index;
+        System.out.println("Selected set " + label);
     }
 
-    // Method shells for you to implement later:
+    private void handleDelete(Command command) throws InvalidCommandException {
+        if (command.getArgs().size() != 1)
+            throw new InvalidCommandException("DELETE requires a letter (A, B, C...)");
 
-    private void handleAdd() throws InvalidCommandException {
-        checkSetSelected();
-        System.out.println("Enter integers to add, separated by spaces:");
-        Scanner scanner = new Scanner(System.in);
-        String line = scanner.nextLine().trim();
-        if (line.isEmpty()) {
-            System.out.println("No values entered. Nothing added.");
-            return;
+        char label = command.getArgs().get(0).toUpperCase().charAt(0);
+        int index = label - 'A';
+
+        if (index < 0 || index >= CollectionSetsOfIntegers.sets.size())
+            throw new InvalidCommandException("Invalid set letter.");
+
+        CollectionSetsOfIntegers.deleteSet(index);
+        System.out.println("Deleted set " + label);
+
+        if (currentSetIndex == index) {
+            currentSetIndex = -1;
         }
-
-        String[] parts = line.split("\\s+");
-        int[] values = new int[parts.length];
-        for (int i = 0; i < parts.length; i++) {
-            values[i] = Integer.parseInt(parts[i]);
-        }
-
-        int[] current = CollectionSetsOfIntegers.sets.get(currentSetIndex);
-        int[] updated = SetOfIntegers.addValue(current, values);
-        CollectionSetsOfIntegers.sets.set(currentSetIndex, updated);
-        System.out.println("Updated set: " + Arrays.toString(updated));
     }
 
     private void handleSort() throws InvalidCommandException {
+        validateSelection();
+        int[] current = CollectionSetsOfIntegers.sets.get(currentSetIndex);
+        CollectionSetsOfIntegers.sets.set(currentSetIndex, SetOfIntegers.sortIncreasing(current, current));
+        System.out.println("Current set sorted in increasing order.");
+    }
+
+    private void handleReverse() {
         if (currentSetIndex == -1) {
-            throw new InvalidCommandException("No set is currently selected.");
+            System.out.println("No set selected.");
+            return;
+        }
+        int[] current = CollectionSetsOfIntegers.sets.get(currentSetIndex);
+        CollectionSetsOfIntegers.sets.set(currentSetIndex, SetOfIntegers.reverse(current));
+        System.out.println("Current set sorted in decreasing order.");
+    }
+
+    private void handleRandomize() throws InvalidCommandException {
+        validateSelection();
+        int[] current = CollectionSetsOfIntegers.sets.get(currentSetIndex);
+        CollectionSetsOfIntegers.sets.set(currentSetIndex, SetOfIntegers.randomSort(current));
+        System.out.println("Current set randomized.");
+    }
+
+    private void handleAdd(Command command) throws InvalidCommandException {
+        validateSelection();
+        if (command.getArgs().isEmpty()) {
+            throw new InvalidCommandException("ADD requires at least one integer.");
         }
 
-        int[] original = CollectionSetsOfIntegers.sets.get(currentSetIndex);
-        int[] sorted = SetOfIntegers.sortIncreasing(original);
-        CollectionSetsOfIntegers.sets.set(currentSetIndex, sorted);
-        System.out.println("Set sorted in increasing order: " + Arrays.toString(sorted));
-    }
-
-    private void handleReverse() throws InvalidCommandException {
-        if (currentSetIndex == -1) {
-            throw new InvalidCommandException("No set is currently selected.");
-        }
-
-        int[] original = CollectionSetsOfIntegers.sets.get(currentSetIndex);
-        int[] reversed = SetOfIntegers.sortDecreasing(original);
-        CollectionSetsOfIntegers.sets.set(currentSetIndex, reversed);
-        System.out.println("Set sorted in decreasing order: " + Arrays.toString(reversed));
-    }
-
-    private void handleLabel() {
-        // TODO: implement LABEL command
-    }
-
-    private void handleHelp() {
-        // TODO: implement HELP command
-    }
-
-    private void handleSave() {
-        // TODO: implement SAVE command
-    }
-
-    private void handleRestore() {
-        // TODO: implement RESTORE command
-    }
-
-    private void handleQuit() {
-        // TODO: implement QUIT command (if different from EXIT)
-    }
-    
-    private void checkSetSelected() throws InvalidCommandException {
-        if (currentSetIndex == -1 || currentSetIndex >= CollectionSetsOfIntegers.sets.size()) {
-            throw new InvalidCommandException("No valid set is currently selected.");
+        try {
+            int[] toAdd = command.getArgs().stream().mapToInt(Integer::parseInt).toArray();
+            int[] updated = SetOfIntegers.addValue(CollectionSetsOfIntegers.sets.get(currentSetIndex), toAdd);
+            CollectionSetsOfIntegers.sets.set(currentSetIndex, updated);
+            System.out.println("Added values: " + Arrays.toString(toAdd));
+        } catch (NumberFormatException e) {
+            throw new InvalidCommandException("ADD only accepts integers.");
         }
     }
 
-    // --- Supporting classes ---
-
-    public static class Command {
-        private CommandType type;
-        private List<String> args;
-
-        public Command(CommandType type, List<String> args) {
-            this.type = type;
-            this.args = args;
+    private void handleRemove(Command command) throws InvalidCommandException {
+        validateSelection();
+        if (command.getArgs().isEmpty()) {
+            throw new InvalidCommandException("REMOVE requires at least one integer.");
         }
 
-        public CommandType getType() {
-            return type;
-        }
-
-        public List<String> getArgs() {
-            return args;
+        try {
+            int[] toRemove = command.getArgs().stream().mapToInt(Integer::parseInt).toArray();
+            int[] updated = SetOfIntegers.removeValue(CollectionSetsOfIntegers.sets.get(currentSetIndex), toRemove);
+            CollectionSetsOfIntegers.sets.set(currentSetIndex, updated);
+            System.out.println("Removed values: " + Arrays.toString(toRemove));
+        } catch (NumberFormatException e) {
+            throw new InvalidCommandException("REMOVE only accepts integers.");
         }
     }
 
-    public enum CommandType {
-        SHOW, NEW, ADD, SORT, REVERSE, LABEL, DELETE, HELP, EXIT, SELECT, SAVE, RESTORE, QUIT
-    }
+    private void handleSave(Command command) throws InvalidCommandException {
+        if (command.getArgs().size() != 1)
+            throw new InvalidCommandException("SAVE requires a filename.");
 
-    public static class InvalidCommandException extends Exception {
-        public InvalidCommandException(String message) {
-            super(message);
+        String filename = command.getArgs().get(0);
+        try {
+            CollectionSetsOfIntegers.save(filename);
+        } catch (java.io.FileNotFoundException e) {
+            System.out.println("Error saving file: " + e.getMessage());
         }
     }
 
-    // Simple command parser (you can improve this later)
+    private void handleRestore(Command command) throws InvalidCommandException {
+        if (command.getArgs().size() != 1)
+            throw new InvalidCommandException("RESTORE requires a filename.");
+
+        String filename = command.getArgs().get(0);
+        try {
+            CollectionSetsOfIntegers.restore(filename);
+        } catch (java.io.FileNotFoundException e) {
+            System.out.println("Error restoring file: " + e.getMessage());
+        }
+    }
+
+
+    //  Utility Methods 
+
+    private void validateSelection() throws InvalidCommandException {
+        if (currentSetIndex == -1)
+            throw new InvalidCommandException("No set selected. Use SELECT command first.");
+    }
+
     private Command parseCommand(String input) throws InvalidCommandException {
-        String[] parts = input.trim().split("\\s+");
-        if (parts.length == 0) {
-            throw new InvalidCommandException("Empty input.");
+        if (input == null || input.isBlank()) {
+            throw new InvalidCommandException("Command cannot be empty.");
         }
 
+        String[] parts = input.trim().split("\\s+");
         String keyword = parts[0].toUpperCase();
-        CommandType type;
 
+        CommandType type;
         try {
             type = CommandType.valueOf(keyword);
         } catch (IllegalArgumentException e) {
             throw new InvalidCommandException("Unknown command: " + keyword);
         }
 
-        List<String> args = new ArrayList<>();
-        for (int i = 1; i < parts.length; i++) {
-            args.add(parts[i]);
+        List<String> args = Arrays.asList(parts).subList(1, parts.length);
+        return new Command(type, args);
+    }
+
+    //  Inner Classes 
+
+    private static class Command {
+        private final CommandType type;
+        private final List<String> args;
+
+        public Command(CommandType type, List<String> args) {
+            this.type = type;
+            this.args = args;
         }
 
-        return new Command(type, args);
+        public CommandType getType() { return type; }
+        public List<String> getArgs() { return args; }
+    }
+
+    private enum CommandType {
+        NEW, SHOW, SELECT, DELETE,
+        SORT, REVERSE, RANDOMIZE,
+        ADD, REMOVE,
+        SAVE, RESTORE,
+        HELP, EXIT, QUIT
+    }
+
+    private static class InvalidCommandException extends Exception {
+        public InvalidCommandException(String message) {
+            super(message);
+        }
     }
 }
