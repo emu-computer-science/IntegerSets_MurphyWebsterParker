@@ -13,7 +13,7 @@ public class UserInteraction {
             System.out.println("Invalid command: " + e.getMessage());
             return true;
         }
-    }
+    }//idk
 
     // Dispatches the command to the appropriate handler method
     private boolean dispatch(Command command) throws InvalidCommandException {
