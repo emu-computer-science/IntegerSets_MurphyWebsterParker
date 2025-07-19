@@ -50,9 +50,9 @@ public class RunIntegerSets {
                     break;
                 case "SAVE":
                 case "RESTORE":
-                    System.out.println("Enter filename:");
-                    String filename = scanner.nextLine().trim();
-                    input = commandWord + " " + filename;
+                	 System.out.println("Enter filename:");
+                     String filename = scanner.nextLine().trim();
+                     input = commandWord + " " + filename;
                     break;
                 default:
                     break;
