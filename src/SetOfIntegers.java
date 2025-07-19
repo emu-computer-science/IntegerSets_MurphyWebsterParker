@@ -80,4 +80,3 @@ public class SetOfIntegers {
         return resultList.stream().mapToInt(Integer::intValue).toArray();
     }
 }
-
